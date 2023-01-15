@@ -2,10 +2,10 @@ import numpy as np
 import utils.innovation_generator as ig
 
 class Connection:
-    def __init__(self, input, output):
+    def __init__(self, input, output, weight=None):
         self.input = input
         self.output = output
-        self.weight = np.random.uniform(-1, 1)
+        self.weight = np.random.uniform(-1, 1) if weight is None else weight
         self.innovation = ig.get_new_innovation_number()
         self.enabled = True
         

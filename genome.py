@@ -3,12 +3,13 @@ from connection import Connection
 import networkx as nx
 
 class Genome:
-    def __init__(self, id, n_inputs, n_outputs):
+    def __init__(self, id, n_inputs, n_outputs, testmode=False):
         self.genome_id = id
         self.n_inputs = n_inputs
         self.n_outputs = n_outputs
+        self.testmode = testmode
         self.nodes = self.create_nodes()
-        self.connections = self.create_connections()
+        self.connections: list[Connection] = self.create_connections()
         
     def create_nodes(self) -> list:
         nodes = []
@@ -19,13 +20,19 @@ class Genome:
             nodes.append(Node(i, NodeType.Output))
         return nodes
     
+    def nodes_to_dict(self):
+        return {obj.id: obj for obj in self.nodes}
+    
     def create_connections(self) -> list:
         connections = []
         input_nodes = [node for node in self.nodes if node.nodeType == NodeType.Input_Sensor or node.nodeType == NodeType.Bias]
         output_nodes = [node for node in self.nodes if node.nodeType == NodeType.Output]
         for i in input_nodes:
             for j in output_nodes:
-                connections.append(Connection(i.id, j.id))
+                if self.testmode:
+                    connections.append(Connection(i.id, j.id, 0.5))
+                else:
+                    connections.append(Connection(i.id, j.id))
         return connections
     
     def visualize(self, show_weights=False):
