@@ -2,27 +2,24 @@ from genome import Genome, Node, NodeType
 import unittest    
 import math
 from connection import Connection
+from utils import helpers
 
 class FFN:    
     def __init__(self, genome: Genome, input_values: list[float]):
         self.genome = genome
         self.input_values = input_values
-        self.nodes_dict = self.genome.nodes_to_dict()
-        
-    def is_input(self, node: Node):
-        return node.nodeType == NodeType.Input_Sensor or node.nodeType == NodeType.Bias
     
     def sigmoid(self, x):
         return 1 / (1 + math.exp(-4.9 * x))    
         
     def forward(self):
         sorted_connections = sorted(self.genome.connections, key=lambda x: x.input, reverse=True)
-        input_nodes = [node for node in self.genome.nodes if self.is_input(node)]
+        input_nodes = [node for node in self.genome.nodes if helpers.is_input(node)]
         output_nodes = [node for node in self.genome.nodes if node.nodeType == NodeType.Output]
         for input_node, input_value in zip(input_nodes, self.input_values):
             input_node.value = input_value                                     
         input_node_connections = [connection for connection in sorted_connections 
-                                  if (self.is_input(self.nodes_dict[connection.input])
+                                  if (helpers.is_input(self.genome.nodes_to_dict()[connection.input])
                                   and connection.enabled)]
         
         temp_outputs, sorted_connections = self.calculate_connection(input_node_connections, sorted_connections)
@@ -50,8 +47,8 @@ class FFN:
     def calculate_connection(self, connections: list[Connection], rest_connections: list[Connection]):
         temp_outputs = []
         for connection in connections:
-            input_node: Node = self.nodes_dict[connection.input]
-            output_node: Node = self.nodes_dict[connection.output]
+            input_node: Node = self.genome.nodes_to_dict()[connection.input]
+            output_node: Node = self.genome.nodes_to_dict()[connection.output]
             temp_outputs.append(output_node)
             output_node.value += input_node.value * connection.weight
             rest_connections.remove(connection)

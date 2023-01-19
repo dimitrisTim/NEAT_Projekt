@@ -15,4 +15,13 @@ class Connection:
         + '\n' + "Output: " + str(self.output) \
         + '\n' + "Weight: " + str(self.weight) \
         + '\n' + "Enabled: " + str(self.enabled) + '\n'
+        
+    def __eq__(self, other):
+        if isinstance(other, self.__class__): 
+            return self.input == other.input and self.output == other.output    
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
     
