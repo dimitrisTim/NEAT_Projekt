@@ -15,7 +15,7 @@ class FFN:
     def forward(self):
         sorted_connections = sorted(self.genome.connections, key=lambda x: x.input, reverse=True)
         input_nodes = [node for node in self.genome.nodes if helpers.is_input(node)]
-        output_nodes = [node for node in self.genome.nodes if node.nodeType == NodeType.Output]
+        output_nodes = [node for node in self.genome.nodes if node.nodeType == NodeType.OUTPUT]
         for input_node, input_value in zip(input_nodes, self.input_values):
             input_node.value = input_value                                     
         input_node_connections = [connection for connection in sorted_connections 

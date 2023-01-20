@@ -15,14 +15,14 @@ class TestFFN(unittest.TestCase):
         ffn.forward()
         for i, node in enumerate(genome.nodes):
             if ffn.is_input(node):
-                if node.nodeType == NodeType.Bias:
+                if node.nodeType == NodeType.BIAS:
                     self.assertEqual(node.value, 1)
                 else:    
                     self.assertEqual(node.value, input_values[i])
                     
         output_values = [0.999]
         for node in genome.nodes:
-            if node.nodeType == NodeType.Output:
+            if node.nodeType == NodeType.OUTPUT:
                 self.assertAlmostEqual(node.value, output_values[0], 2)
 
 if __name__ == '__main__':
