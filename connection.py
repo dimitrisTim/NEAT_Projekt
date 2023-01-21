@@ -2,11 +2,11 @@ import numpy as np
 import utils.innovation_generator as ig
 
 class Connection:
-    def __init__(self, input, output, weight=np.random.uniform(-1, 1), innovation=ig.get_new_innovation_number()):
+    def __init__(self, input, output, weight = None, innovation = None):
         self.input = input
         self.output = output
-        self.weight = weight
-        self.innovation = innovation
+        self.weight = np.random.uniform(-1, 1) if weight is None else weight
+        self.innovation = ig.get_new_innovation_number() if innovation is None else innovation
         self.enabled = True
         
     def __str__(self):
@@ -25,3 +25,13 @@ class Connection:
     def __ne__(self, other):
         return not self.__eq__(other)
     
+    
+innovations: list[Connection] = []
+
+def create_connection(input_id, output_id):
+    for innovation in innovations:
+        if innovation.input == input_id and innovation.output == output_id:            
+            return innovation
+    new_innovation = Connection(input_id, output_id)
+    innovations.append(new_innovation)
+    return new_innovation

@@ -1,11 +1,9 @@
-from utils import helpers
-from utils import innovation_generator as ig
+import utils.helpers as helpers
 from node import Node, NodeType
-from connection import Connection
+from connection import Connection, create_connection
 import networkx as nx
 import numpy as np
 import random
-import utils.innovation_generator 
 
 class Genome:
     def __init__(self, id, n_inputs, n_outputs, init_connections:bool = True, testmode=False, link_mutr = 0.2, node_mutr = 0.2):
@@ -17,7 +15,8 @@ class Genome:
         self.connections: list[Connection] = self.create_initial_connections() if init_connections else []
         self.link_mr = link_mutr
         self.node_mr = node_mutr
-        self.n_hidden_nodes = 0                
+        self.n_hidden_nodes = 0
+        self.fitness = float('-inf')       
         
     def create_nodes(self) -> list:
         nodes = []
@@ -29,7 +28,7 @@ class Genome:
         return nodes
     
     def add_connection(self, node_input, node_output):
-        newConnection = ig.create_connection(node_input, node_output)
+        newConnection = create_connection(node_input, node_output)
         newConnectionReverse = Connection(node_output, node_input, innovation=newConnection.innovation)
         #Avoid recurrent connections and duplicates
         if newConnection not in self.connections and newConnectionReverse not in self.connections:
@@ -79,13 +78,13 @@ class Genome:
         self.mutate_nodes()
 
             
-    def visualize(self, show_weights=False):
+    def visualize(self, show_weights=False, show_innovations=False):
         # Create a directed graph, add nodes and also the weights of the connections
         G = nx.DiGraph()
         for node in self.nodes:
             G.add_node(node.id)
         for connection in helpers.get_enabled_connections(self.connections):
-            G.add_edge(connection.input, connection.output, weight=round(connection.weight, 2))
+            G.add_edge(connection.input, connection.output, weight=round(connection.weight, 2), innovation=connection.innovation)
         # Create a layout for the graph
         pos = nx.circular_layout(G)
         # Draw the nodes
@@ -97,6 +96,9 @@ class Genome:
         # Draw the weights
         if show_weights:
             edge_labels = nx.get_edge_attributes(G, 'weight')
+            nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+        if show_innovations:
+            edge_labels = nx.get_edge_attributes(G, 'innovation')
             nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
     
