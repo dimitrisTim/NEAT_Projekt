@@ -2,9 +2,10 @@ from genome import Genome
 from node import Node, NodeType
 from connection import Connection
 import numpy as np
+import utils.distance as distance
 
 def crossover(parent1: Genome, parent2: Genome, num_genomes: int) -> Genome:
-    sorted_innovations = innovations_dict(parent1, parent2)
+    sorted_innovations = distance.innovations_dict(parent1, parent2)
     child_innovations = []
     fittest_parent = parent1 if parent1.fitness > parent2.fitness \
                     else parent2 if parent1.fitness < parent2.fitness \
@@ -29,14 +30,3 @@ def crossover(parent1: Genome, parent2: Genome, num_genomes: int) -> Genome:
         id += 1
     child.connections = child_innovations
     return child
-
-def innovations_dict(parent1: Genome, parent2: Genome) -> dict:
-    innovations = {}
-    for connection in parent1.connections:
-        innovations[connection.innovation] = {parent1 : connection}
-    for connection in parent2.connections:
-        if connection.innovation in innovations.keys():
-            innovations[connection.innovation][parent2] = connection
-        else:
-            innovations[connection.innovation] = {parent2 : connection}
-    return dict(sorted(innovations.items()))

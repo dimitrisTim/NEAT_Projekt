@@ -5,6 +5,7 @@ import networkx as nx
 import numpy as np
 import random
 
+
 class Genome:
     def __init__(self, id, n_inputs, n_outputs, init_connections:bool = True, testmode=False, link_mutr = 0.2, node_mutr = 0.2):
         self.genome_id = id
@@ -16,7 +17,10 @@ class Genome:
         self.link_mr = link_mutr
         self.node_mr = node_mutr
         self.n_hidden_nodes = 0
-        self.fitness = float('-inf')       
+        self.fitness = float('-inf')
+        self.c1 = 1
+        self.c2 = 1
+        self.c3 = 0.4
         
     def create_nodes(self) -> list:
         nodes = []
@@ -78,30 +82,31 @@ class Genome:
         self.mutate_nodes()
 
             
-    def visualize(self, show_weights=False, show_innovations=False):
-        # Create a directed graph, add nodes and also the weights of the connections
+    def visualize(self, show_weights=False, show_node_values = False, show_innovations=False):
         G = nx.DiGraph()
         for node in self.nodes:
-            G.add_node(node.id)
+            G.add_node(node.id, value=round(node.value, 2))
         for connection in helpers.get_enabled_connections(self.connections):
             G.add_edge(connection.input, connection.output, weight=round(connection.weight, 2), innovation=connection.innovation)
-        # Create a layout for the graph
         pos = nx.circular_layout(G)
-        # Draw the nodes
         nx.draw_networkx_nodes(G, pos, node_size=250, node_color='#A0CBE2')
-        # Draw the edges
         nx.draw_networkx_edges(G, pos, width=1)
-        # Draw the labels
-        nx.draw_networkx_labels(G, pos, font_size=14, font_family='sans-serif')
-        # Draw the weights
+        #nx.draw_networkx_labels(G, pos, font_size=14, font_family='sans-serif')
+        if show_node_values:
+            node_labels = nx.get_node_attributes(G, 'value')
+            nx.draw_networkx_nodes(G, pos, node_size=400, node_color='#A0CBE2')
+            nx.draw_networkx_labels(G, pos, labels=node_labels)
+        else:
+            node_labels = {node: node for node in G.nodes()}
+            nx.draw_networkx_labels(G, pos, labels=node_labels)
         if show_weights:
             edge_labels = nx.get_edge_attributes(G, 'weight')
             nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
         if show_innovations:
             edge_labels = nx.get_edge_attributes(G, 'innovation')
-            nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-
-    
+            nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels) 
+        
+        
     def __str__(self) -> str:
         print("===== Nodes: =====")
         for node in self.nodes:
@@ -110,3 +115,5 @@ class Genome:
         for connection in self.connections:
             print(connection)
         return ""
+
+

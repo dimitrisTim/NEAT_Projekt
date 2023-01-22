@@ -41,8 +41,9 @@ class FFN:
                 if len(temp_as_input_conn) > 0:
                     new_temp_outputs, sorted_connections = self.calculate_connection(temp_as_input_conn, sorted_connections)
                     temp_outputs.extend(new_temp_outputs)
-                    temp_outputs.remove(temp_output)
-                
+                    temp_outputs.remove(temp_output)                    
+        for output_node in output_nodes:
+            print(output_node.value)
     
     def calculate_connection(self, connections: list[Connection], rest_connections: list[Connection]):
         temp_outputs = []
